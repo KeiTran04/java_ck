@@ -1,0 +1,228 @@
+/* Bootstrap overrides & custom styles */
+:root {
+    --bg-primary: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-primary: #212529;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --shadow-color: rgba(0,0,0,0.05);
+}
+
+body {
+    background: var(--bg-primary);
+    min-height: 100vh;
+    color: var(--text-primary);
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark-mode {
+    --bg-primary: #1a1d21;
+    --bg-card: #2c2f33;
+    --text-primary: #e9ecef;
+    --text-muted: #adb5bd;
+    --border-color: #44474b;
+    --shadow-color: rgba(0,0,0,0.3);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .order-card,
+body.dark-mode .list-group-item,
+body.dark-mode .table {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .table-light,
+body.dark-mode .table-light th,
+body.dark-mode .table-light td {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+body.dark-mode .breadcrumb-item a {
+    color: #6ea8fe;
+}
+
+body.dark-mode .breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+body.dark-mode .modal-content {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .modal-footer {
+    border-top-color: var(--border-color);
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: #1a1d21;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    background: #1a1d21;
+    color: var(--text-primary);
+}
+
+body.dark-mode .input-group-text {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .navbar-dark {
+    background: #111 !important;
+}
+
+body.dark-mode .card-header {
+    background: var(--bg-card);
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .card-footer {
+    background: var(--bg-card);
+    border-top-color: var(--border-color);
+}
+
+body.dark-mode .text-muted {
+    color: var(--text-muted) !important;
+}
+
+body.dark-mode .page-link {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .page-item.active .page-link {
+    background: #0d6efd;
+    border-color: #0d6efd;
+}
+
+body.dark-mode .page-item.disabled .page-link {
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .loading-overlay {
+    background: rgba(0,0,0,0.7);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+.products-grid .card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.products-grid .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.products-grid .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.price {
+    color: #dc3545;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.stock {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.no-image {
+    height: 200px;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 0.9rem;
+}
+
+.order-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.success-message {
+    max-width: 500px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.error-message {
+    max-width: 500px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.toast-container {
+    z-index: 9999;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+}
+
+/* Product image thumbnail admin */
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+footer {
+    margin-top: auto;
+}
