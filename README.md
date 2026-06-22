@@ -1,6 +1,6 @@
 # Shop Web - Java E-Commerce
 
-Full-stack e-commerce web application built with Jakarta EE (Servlet/JSP), PostgreSQL, and Bootstrap 5.
+Full-stack e-commerce web application built with Jakarta EE (Servlet/JSP), PostgreSQL 16, Bootstrap 5.
 
 ## Tech Stack
 
@@ -18,177 +18,215 @@ Full-stack e-commerce web application built with Jakarta EE (Servlet/JSP), Postg
 ## Features
 
 ### Customer
-- **Product listing** with pagination (12/page), search, category filter, **sort** (price ↑↓, name A→Z), **price range** filter
-- **Product detail** with variant selection (color/capacity/size)
+- **Product listing** — pagination (12/page), search, category filter, sort (price ↑↓, name A→Z), price range filter
+- **Product detail** — variant selection (color/capacity/size)
 - **AJAX cart** — add/update/remove without page reload, persisted to DB across sessions
-- **Checkout** with coupon discount (WELCOME10, GIAM50K, FREESHIP) and payment method (COD/BANK/MOMO)
-- **Order management** — view order history, cancel pending orders, **download invoice XML**
+- **Checkout** — coupon discount (WELCOME10, GIAM50K, FREESHIP), payment method (COD/BANK/MOMO)
+- **Orders** — view history, cancel pending orders, download invoice XML
 - **Wishlist** — toggle products via AJAX
-- **User profile** — edit full name/phone/address, change password
+- **Profile** — edit full name/phone/address, change password
 - **Forgot password** — email reset link with token
-- **Dark mode** toggle — persisted in localStorage
+- **Dark mode** — persisted in localStorage
 
 ### Admin (`/admin/*`)
 - **Dashboard** — revenue chart, order/product/user counts
-- **Product management** — CRUD with image upload (`@MultipartConfig`)
-- **Order management** — update status with confirmation
-- **Coupon management** — create/edit/toggle coupons
-- **User management** — view registered users
+- **Products** — CRUD with image upload
+- **Orders** — update status with confirmation
+- **Coupons** — create/edit/toggle coupons
+- **Users** — view registered users
 
-### Technical Highlights
-- MVC layered: Controller → Service → DAO → JDBC
-- `SecurityFilter` protects all `/admin/*` routes
-- `OrderProcessingTask` runs asynchronously: generates invoice XML + sends confirmation email
-- Cart synced to `cart` table on every mutation (survives logout/login)
-- Responsive design (Bootstrap 5)
-- Toast notifications for AJAX operations
-- Client-side form validation (Bootstrap + custom JS)
+---
 
-## Database Setup
+## Setup trên macOS
 
-1. Install PostgreSQL 16
-2. Create database and run migration:
+### 1. Cài đặt Prerequisites (Homebrew)
+
+```bash
+# Homebrew (nếu chưa có)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Java 17
+brew install openjdk@17
+echo 'export PATH="/usr/local/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
+echo 'export JAVA_HOME="/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"' >> ~/.zshrc
+source ~/.zshrc
+java -version   # openjdk 17.x
+
+# Maven
+brew install maven
+mvn -version    # Apache Maven 3.9.x
+
+# PostgreSQL 16
+brew install postgresql@16
+brew services start postgresql@16
+
+# Tomcat 9
+brew install tomcat@9
+brew services start tomcat@9
+# Kiểm tra: http://localhost:8080
+```
+
+### 2. Clone project
+
+```bash
+cd ~/Documents
+git clone https://github.com/KeiTran04/java_ck.git
+cd java_ck
+```
+
+### 3. Tạo Database
+
+```bash
+psql -U postgres
+```
 
 ```sql
 CREATE DATABASE shopdb;
 \c shopdb;
-\i src/main/resources/database.sql
-\i src/main/resources/migration.sql
+\i ~/Documents/java_ck/src/main/resources/database.sql;
+\i ~/Documents/java_ck/src/main/resources/migration.sql;
+\dt   -- kiểm tra: cart, categories, coupons, order_details, orders,
+       -- password_resets, product_variants, products, users, wishlists
+\q
 ```
 
-Default admin account: `admin` / `123456`
+### 4. Cấu hình
 
-## Configuration
-
-Edit `src/main/resources/db.properties`:
+Sửa `src/main/resources/db.properties`:
 
 ```properties
 db.url=jdbc:postgresql://localhost:5432/shopdb
 db.user=postgres
-db.password=020204
+db.password=<mật-khẩu-của-bạn>
 db.poolSize=10
 
-# SMTP for order confirmation emails
+# SMTP (tuỳ chọn)
 smtp.host=smtp.gmail.com
 smtp.port=587
 smtp.username=your-email@gmail.com
 smtp.password=your-app-password
 smtp.from=your-email@gmail.com
 
-# Invoice storage (outside webapp to survive redeployment)
-invoice.dir=C:\\shop-data\\invoices
+# Invoice storage
+invoice.dir=/Users/<tên-user>/shop-invoices
 ```
 
-## Build & Run
+### 5. Build & Deploy
 
-### Prerequisites
-- **Java 17** (`JAVA_HOME` set)
-- **Maven 3.9+** installed
-- **PostgreSQL 16** running
-- **Tomcat 9** (Servlet 4 compatible)
-
-### Build
 ```bash
-mvn clean package
+# Build WAR
+mvn clean package -DskipTests
+
+# Copy vào Tomcat
+cp target/shop-web.war /usr/local/opt/tomcat@9/libexec/webapps/
+
+# Đợi 10-15s cho Tomcat auto-deploy
+# Mở: http://localhost:8080/shop-web/
 ```
 
-### Deploy to Tomcat
-```bash
-# Copy WAR to Tomcat webapps
-copy target\shop-web.war C:\tools\apache-tomcat-9.0.118\webapps\
-```
+### 6. Chạy Tests
 
-Or use Tomcat Manager UI.
-
-### Run
-```bash
-# Start Tomcat
-C:\tools\apache-tomcat-9.0.118\bin\startup.bat
-```
-
-App will be available at `http://localhost:8080/shop-web/`
-
-### Test
 ```bash
 mvn test
+# Kết quả: 51 tests, 0 failures
 ```
 
-## Project Structure
+### 7. Tài khoản mặc định
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `123456` |
+| User | `user1` | `123456` |
+
+---
+
+## Cấu trúc project
 
 ```
-D:\java_ck\
+java_ck/
 ├── pom.xml
-├── src/
-│   ├── main/
-│   │   ├── java/com/shop/
-│   │   │   ├── config/       # DataSourceConfig (HikariCP)
-│   │   │   ├── controller/   # Servlets (14 files)
-│   │   │   ├── dao/          # Data access (8 files)
-│   │   │   ├── dto/          # Invoice DTO (JAXB)
-│   │   │   ├── filter/       # SecurityFilter
-│   │   │   ├── model/        # POJOs (7 files)
-│   │   │   ├── service/      # OrderService
-│   │   │   ├── task/         # OrderProcessingTask, XmlGenerator
-│   │   │   └── util/         # EmailUtil, PasswordUtil
-│   │   ├── resources/
-│   │   │   ├── db.properties
-│   │   │   ├── database.sql  # Schema + seed data
-│   │   │   ├── migration.sql # New tables (wishlist, cart, variants, coupons, password_resets)
-│   │   │   └── logback.xml
-│   │   └── webapp/
-│   │       ├── WEB-INF/footer.jsp
-│   │       ├── assets/css/style.css
-│   │       ├── assets/js/main.js
-│   │       ├── admin/        # Admin JSPs (5 files)
-│   │       ├── home.jsp, cart.jsp, checkout.jsp, orders.jsp,
-│   │       │   product-detail.jsp, wishlist.jsp, profile.jsp,
-│   │       │   change-password.jsp, forgot-password.jsp,
-│   │       │   reset-password.jsp, login.jsp, register.jsp,
-│   │       │   order-success.jsp, error.jsp
-│   │       └── assets/images/
-│   └── test/java/com/shop/   # Unit tests (51 tests)
-└── .gitignore
+├── src/main/java/com/shop/
+│   ├── config/       # DataSourceConfig (HikariCP)
+│   ├── controller/   # 14 Servlets
+│   ├── dao/          # 8 DAOs (Cart, Category, Coupon, Order, Product, ProductVariant, User, Wishlist)
+│   ├── dto/          # Invoice DTO (JAXB)
+│   ├── filter/       # SecurityFilter
+│   ├── model/        # 7 POJOs
+│   ├── service/      # OrderService, ProductService, UserService
+│   ├── task/         # OrderProcessingTask, XmlGenerator
+│   └── util/         # EmailUtil, PasswordUtil
+├── src/main/resources/
+│   ├── db.properties
+│   ├── database.sql      # Schema + seed
+│   ├── migration.sql     # Wishlist, cart, variants, coupons, password_resets
+│   └── logback.xml
+├── src/main/webapp/
+│   ├── admin/            # 5 JSP quản trị
+│   ├── assets/css/style.css
+│   ├── assets/js/main.js
+│   ├── assets/images/
+│   └── *.jsp             # Customer pages
+└── src/test/             # 51 unit tests
 ```
 
 ## API Endpoints
 
 ### Public
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Redirect to `/home` |
-| GET | `/home` | Product listing (search, category, sort, price filter, pagination) |
-| GET | `/product?id=N` | Product detail + variants |
-| POST | `/login` | Login |
-| POST | `/register` | Register |
-| GET | `/forgot-password` | Forgot password form |
-| POST | `/forgot-password` | Send reset email |
-| GET | `/reset-password` | Reset password form (with token) |
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET | `/` | Redirect → `/home` |
+| GET | `/home` | Danh sách sản phẩm (search, category, sort, price filter, phân trang) |
+| GET | `/product?id=N` | Chi tiết sản phẩm + variants |
+| POST | `/login` | Đăng nhập |
+| POST | `/register` | Đăng ký |
+| GET | `/forgot-password` | Form quên mật khẩu |
+| POST | `/forgot-password` | Gửi email reset |
+| GET | `/reset-password` | Form đặt lại mật khẩu |
 
 ### Authenticated
-| Method | Path | Description |
-|--------|------|-------------|
-| GET/POST | `/cart` | View/Add/Update/Remove cart items (AJAX) |
-| GET/POST | `/checkout` | Apply coupon / Place order |
-| GET | `/orders` | Order history |
-| POST | `/orders` | Cancel order |
-| GET | `/orders?action=download-invoice&id=N` | Download invoice XML |
-| GET/POST | `/wishlist` | List/Toggle wishlist (AJAX) |
-| GET/POST | `/profile` | View/Update profile |
-| GET/POST | `/profile?action=change-password` | Change password |
-| GET | `/logout` | Logout |
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET/POST | `/cart` | Xem/Thêm/Sửa/Xoá giỏ hàng (AJAX) |
+| GET/POST | `/checkout` | Áp dụng coupon / Đặt hàng |
+| GET | `/orders` | Lịch sử đơn hàng |
+| POST | `/orders` | Huỷ đơn (PENDING) |
+| GET | `/orders?action=download-invoice&id=N` | Tải hoá đơn XML |
+| GET/POST | `/wishlist` | Danh sách/Thêm/Xoá yêu thích (AJAX) |
+| GET/POST | `/profile` | Xem/Sửa thông tin |
+| GET/POST | `/profile?action=change-password` | Đổi mật khẩu |
+| GET | `/logout` | Đăng xuất |
 
 ### Admin
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/admin/dashboard` | Dashboard with charts |
-| GET | `/admin/products` | Product list |
-| GET/POST | `/admin/products?action=create` | Add product |
-| GET/POST | `/admin/products?action=edit&id=N` | Edit product |
-| POST | `/admin/products?action=delete&id=N` | Delete product |
-| GET | `/admin/orders` | Order list |
-| POST | `/admin/orders` | Update order status |
-| GET | `/admin/coupons` | Coupon list |
-| GET/POST | `/admin/coupons?action=create` | Add coupon |
-| GET/POST | `/admin/coupons?action=edit&id=N` | Edit coupon |
-| GET | `/admin/coupons?action=toggle&id=N` | Toggle active |
-| GET | `/admin/users` | User list |
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET | `/admin/dashboard` | Thống kê (biểu đồ doanh thu) |
+| GET | `/admin/products` | Danh sách sản phẩm |
+| GET/POST | `/admin/products?action=create` | Thêm sản phẩm |
+| GET/POST | `/admin/products?action=edit&id=N` | Sửa sản phẩm |
+| GET | `/admin/orders` | Danh sách đơn hàng |
+| POST | `/admin/orders` | Cập nhật trạng thái |
+| GET | `/admin/coupons` | Danh sách mã giảm giá |
+| GET/POST | `/admin/coupons?action=create` | Thêm mã |
+| GET/POST | `/admin/coupons?action=edit&id=N` | Sửa mã |
+| GET | `/admin/coupons?action=toggle&id=N` | Bật/Tắt mã |
+| GET | `/admin/users` | Danh sách người dùng |
+
+## Troubleshooting
+
+### Java not found
+```bash
+echo $JAVA_HOME   # phải trỏ đến openjdk@17
+```
+
+### Tomcat port conflict
+```bash
+lsof -i :8080
+kill -9 <PID>
+# hoặc sửa port trong /usr/local/opt/tomcat@9/libexec/conf/server.xml
+```
+
+### PostgreSQL connection refused
+```bash
+brew services restart postgresql@16
+lsof -i :5432
+```
